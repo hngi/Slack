@@ -1,5 +1,7 @@
+/* eslint-disable no-unused-vars */
+import request from 'request';
 import { BOT_TOKEN } from '../config/config';
-import { sendMessageToSlackResponseURL } from '../helpers/slackResponse';
+import { prepareRequestMessage } from '../helpers/slackResponse';
 import { initMessage } from '../helpers/messages';
 
 export const getSlashCommandInfo = (req, res) => {
@@ -9,7 +11,12 @@ export const getSlashCommandInfo = (req, res) => {
     res.status(403).end('Access forbidden');
   }
   const responseURL = payload.response_url;
-  sendMessageToSlackResponseURL(responseURL, initMessage);
+  const postOptions = prepareRequestMessage(responseURL, initMessage);
+  request(postOptions, (error, response, body) => {
+    if (error) {
+      console.log(error);
+    }
+  });
 };
 
 export const initButtonConfirmation = (req, res) => {
@@ -19,5 +26,11 @@ export const initButtonConfirmation = (req, res) => {
     text: `${actionJSONPayload.user.name} clicked: ${actionJSONPayload.actions[0].name}`,
     replace_original: false,
   };
-  sendMessageToSlackResponseURL(actionJSONPayload.response_url, message);
+  const postOptions = prepareRequestMessage(actionJSONPayload.response_url, message);
+  request(postOptions, (error, response, body) => {
+    if (error) {
+      console.log(error);
+    }
+    // google drive auth function is called here
+  });
 };

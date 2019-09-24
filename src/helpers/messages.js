@@ -1,8 +1,7 @@
 export const initMessage = {
-  text: 'Do you want to save conversations to drive?',
   attachments: [
     {
-      text: 'Building buttons is easy right?',
+      text: 'Do you want to save conversations to drive?',
       fallback: "Shame... buttons aren't supported in this land",
       callback_id: 'button_tutorial',
       color: '#3AA3E3',
