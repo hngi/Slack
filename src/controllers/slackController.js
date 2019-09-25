@@ -18,19 +18,19 @@ export const getSlashCommandInfo = (req, res) => {
 export const initButtonConfirmation = (req, res) => {
   let message;
   res.status(200).end(); // best practice to respond with 200 status
-  const { payload } = JSON.parse(req.body);
-  console.log(payload);
-  if (payload.actions.name === 'no') {
+  const responsePayload = JSON.parse(req.body.payload);
+  console.log(responsePayload);
+  if (responsePayload.actions.name === 'no') {
     message = {
-      text: `Bye ${payload.user.name}`,
+      text: `Bye ${responsePayload.user.name}`,
       replace_original: false,
     };
   }
   message = {
-    text: `${payload.user.name} your conversation will be saved to Google Drive`,
+    text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
     replace_original: false,
   };
-  const postOptions = prepareRequestMessage(payload.response_url, message);
+  const postOptions = prepareRequestMessage(responsePayload.response_url, message);
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
