@@ -4,7 +4,7 @@
   "description": "A slack bot that can be used to save conversation in an external drive.",
   "main": "index.js",
   "scripts": {
-    "build": "babel ./src --out-dir ./dist --copy-files src/controllers/credentials",
+    "build": "babel ./src --out-dir ./dist",
     "start": "node ./dist/index.js",
     "start-dev": "DEBUG=app/debug nodemon --exec babel-node ./src/index.js",
     "heroku-postbuild": "npm run build"
