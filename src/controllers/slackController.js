@@ -47,9 +47,15 @@ export const getConversationsHistory = (req, res) => {
     uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${req.channel.id}`,
     method: 'GET',
   };
-
+  console.log(options);
   request(options, (error, response, body) => {
-    console.log(body);
+    const payload = JSON.parse(body);
+    const data = payload.messages.map(msg => ({
+      by: msg.user,
+      time: msg.ts,
+      text: msg.text,
+    }));
+    console.log(data);
   });
   // google drive auth function is called here
 };
