@@ -2,7 +2,7 @@ import request from 'request';
 import {
   BOT_TOKEN, CLIENT_ID, CLIENT_SECRET,
 } from '../config/config';
-import { prepareRequestMessage } from '../helpers/slackResponse';
+import { prepareRequestMessage } from '../helpers/slackRequest';
 import { forbiddenMessage } from '../helpers/messages';
 
 export const authenticateApp = (req, res) => {
@@ -28,7 +28,7 @@ export const checkAuth = (req, res, next) => {
   if (!payload.token) {
     res.status(403).end('Access forbidden');
     const responseURL = payload.response_url;
-    const postOptions = prepareRequestMessage(responseURL, forbiddenMessage);
+    const postOptions = prepareRequestMessage('POST', responseURL, forbiddenMessage);
     request(postOptions, (error, response, body) => {
       if (error) {
         console.log(error);
