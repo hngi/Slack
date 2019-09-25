@@ -22,17 +22,13 @@ export const authenticateAppRedirect = (req, res) => {
     if (!JSONresponse.ok) {
       res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
     }
-    console.log(JSONresponse);
-    console.log(process.env.BOT_TOKEN);
     process.env.BOT_TOKEN = JSONresponse.access_token;
-    console.log(process.env.BOT_TOKEN);
     res.redirect('https://priapus.slack.com/apps/ANFETCSN5-priapus-saver');
   });
 };
 
 export const checkAuth = (req, res, next) => {
   const payload = req.body;
-  console.log(payload);
   if (!payload.token) {
     res.status(403).end('Access forbidden');
     const responseURL = payload.response_url;
