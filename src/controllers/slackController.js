@@ -10,7 +10,7 @@ export const getSlashCommandInfo = (req, res) => {
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
-      // return;
+      return;
     }
   });
 };
@@ -25,16 +25,17 @@ export const initButtonConfirmation = (req, res) => {
       text: `Bye ${responsePayload.user.name}`,
       replace_original: false,
     };
+  } else {
+    message = {
+      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
+      replace_original: false,
+    };
   }
-  message = {
-    text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
-    replace_original: false,
-  };
   const postOptions = prepareRequestMessage(responsePayload.response_url, message);
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
-      // return;
+      return;
     }
 
     // google drive auth function is called here
