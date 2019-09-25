@@ -101,11 +101,11 @@ function getAccessToken(oAuth2Client, callback) {
   function uploadFile(auth) {
     const drive = google.drive({ version: 'v3', auth });
     var fileMetadata = {
-        'name': 'test22.jpg'
+        'name': 'Bottest.jpg'
     };
     var media = {
         mimeType: 'image/jpeg',
-        body: fs.createReadStream('test22.jpg')
+        body: fs.createReadStream('../helpers/test.jpg')
     };
     drive.files.create({
         resource: fileMetadata,
@@ -159,10 +159,8 @@ export const getConversationsHistory = (req, res) => {
   };
   console.log(options);
   request(options, (error, response, body) => {
-    console.log(body);
-    const payload = body.messages;
-    console.log(payload);
-    const data = payload.map(msg => ({
+    const payload = JSON.parse(body);
+    const data = payload.messages.map(msg => ({
       by: msg.user,
       time: msg.ts,
       text: msg.text,
