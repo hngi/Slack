@@ -18,7 +18,7 @@ export const getSlashCommandInfo = (req, res) => {
 export const initButtonConfirmation = (req, res) => {
   let message;
   res.status(200).end(); // best practice to respond with 200 status
-  const payload = JSON.stringify(req.body);
+  const { payload } = JSON.parse(req.body);
   console.log(payload);
   if (payload.actions.name === 'no') {
     message = {
