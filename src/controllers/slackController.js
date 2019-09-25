@@ -18,26 +18,33 @@ export const getSlashCommandInfo = (req, res) => {
 
 export const initButtonConfirmation = (req, res) => {
   let message;
-  res.status(200).end(); // best practice to respond with 200 status
+  res.sendStatus(200).end(); // best practice to respond with 200 status
   const responsePayload = JSON.parse(req.body.payload);
   console.log(responsePayload);
   if (responsePayload.actions[0].name === 'no') {
     message = {
+      response_type: 'ephemeral',
       text: `Bye ${responsePayload.user.name}`,
-      replace_original: false,
     };
-  } else {
-    message = {
-      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
-      replace_original: false,
-    };
-  }
-  const postOptions = prepareRequestMessage(responsePayload.response_url, message);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-    }
+    res.send(message);
     return;
-    // google drive auth function is called here
-  });
+  }
+  message = {
+    response_type: 'ephemeral',
+    text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
+  };
+  res.send(message);
+  // get slack channel history
+  // google drive auth function is called here
+  return;
+
+  // const postOptions = prepareRequestMessage(responsePayload.response_url, message);
+  // request(postOptions, (error, response, body) => {
+  //   if (error) {
+  //     console.log(error);
+  //   }
+  //   return;
+  //   // get slack channel history
+  //   // google drive auth function is called here
+  // });
 };
