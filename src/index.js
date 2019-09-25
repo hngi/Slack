@@ -3,6 +3,7 @@ import cors from 'cors';
 import debug from 'debug';
 import bodyParser from 'body-parser';
 import dotenv from 'dotenv';
+import path from 'path';
 import routes from './routes/index';
 
 /**
@@ -26,6 +27,7 @@ app.use(bodyParser.urlencoded({
   extended: false,
 }));
 app.use(bodyParser.json());
+app.use((express.static(path.join(__dirname, '../public'))));
 
 // 3rd party middleware
 app.use(cors('*'));
