@@ -20,7 +20,7 @@ const routes = (app) => {
   app.get('/auth', authenticateApp);
   app.get('/auth/redirect', authenticateAppRedirect);
   app.post('/export-command', checkAuth, getSlashCommandInfo);
-  app.post('/slack/actions', checkAuth, initButtonConfirmation);
+  app.post('/slack/actions', initButtonConfirmation);
   // invalid url
   app.all('*', (req, res) => warningResponse(res, 404, 'Resource not found'));
 };
