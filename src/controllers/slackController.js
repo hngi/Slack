@@ -1,6 +1,6 @@
 import request from 'request';
 import { prepareRequestMessage } from '../helpers/slackResponse';
-import { initMessage, helpMessage } from '../helpers/messages';
+import { initMessage } from '../helpers/messages';
 
 export const getSlashCommandInfo = (req, res) => {
   const payload = req.body;
@@ -10,7 +10,7 @@ export const getSlashCommandInfo = (req, res) => {
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
-      return;
+      // return;
     }
   });
 };
@@ -33,7 +33,7 @@ export const initButtonConfirmation = (req, res) => {
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
-      return;
+      // return;
     }
 
     // google drive auth function is called here

@@ -25,17 +25,16 @@ export const authenticateAppRedirect = (req, res) => {
 
 export const checkAuth = (req, res, next) => {
   const payload = req.body;
-  res.status(200).end();
   if (payload.token !== BOT_TOKEN) {
     res.status(403).end('Access forbidden');
+    const responseURL = payload.response_url;
+    const postOptions = prepareRequestMessage(responseURL, forbiddenMessage);
+    request(postOptions, (error, response, body) => {
+      if (error) {
+        console.log(error);
+      }
+    });
     return;
   }
-  const responseURL = payload.response_url;
-  const postOptions = prepareRequestMessage(responseURL, forbiddenMessage);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-    }
-  });
   next();
 };
