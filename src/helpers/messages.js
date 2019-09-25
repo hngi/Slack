@@ -26,5 +26,5 @@ export const initMessage = {
 
 export const forbiddenMessage = {
   response_type: 'ephemeral', // private message
-  text: ':Priapus: You don\'t have access',
+  text: 'You don\'t have access',
 };
