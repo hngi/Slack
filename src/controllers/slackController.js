@@ -1,13 +1,10 @@
 import request from 'request';
 import { prepareRequestMessage } from '../helpers/slackRequest';
 import { initMessage } from '../helpers/messages';
-import { BOT_TOKEN } from '../config/config';
 
-// [START drive_quickstart]
 const fs = require('fs');
 const readline = require('readline');
-const {google} = require('googleapis');
-
+const { google } = require('googleapis');
 
 
 export const getSlashCommandInfo = (req, res) => {
@@ -42,9 +39,11 @@ const TOKEN_PATH = '../config/token.json';
 
 // Load client secrets from a local file.
 fs.readFile('../config/credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
-  // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), uploadFile);
+    if (err) return console.log('Error loading client secret file:', err);
+    // Authorize a client with credentials, then call the Google Drive API.
+    //authorize(JSON.parse(content), listFiles);
+    //authorize(JSON.parse(content), getFile);
+    authorize(JSON.parse(content), uploadFile);
 });
 
 /**
@@ -54,16 +53,18 @@ fs.readFile('../config/credentials.json', (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {client_secret, client_id, redirect_uris} = credentials.installed;
-  const oAuth2Client = new google.auth.OAuth2(
-      client_id, client_secret, redirect_uris[0]);
+    const { client_secret, client_id, redirect_uris } = credentials.installed;
+    const oAuth2Client = new google.auth.OAuth2(
+        client_id, client_secret, redirect_uris[0]);
 
-  // Check if we have previously stored a token.
-  fs.readFile(TOKEN_PATH, (err, token) => {
-    if (err) return getAccessToken(oAuth2Client, callback);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    callback(oAuth2Client);
-  });
+    // Check if we have previously stored a token.
+    fs.readFile(TOKEN_PATH, (err, token) => {
+        if (err) return getAccessToken(oAuth2Client, callback);
+        oAuth2Client.setCredentials(JSON.parse(token));
+        callback(oAuth2Client);//list files and upload file
+        //callback(oAuth2Client, '0B79LZPgLDaqESF9HV2V3YzYySkE');//get file
+
+    });
 }
 
 /**
@@ -73,32 +74,33 @@ function authorize(credentials, callback) {
  * @param {getEventsCallback} callback The callback for the authorized client.
  */
 function getAccessToken(oAuth2Client, callback) {
-  const authUrl = oAuth2Client.generateAuthUrl({
-    access_type: 'offline',
-    scope: SCOPES,
-  });
-  console.log('Authorize this app by visiting this url:', authUrl);
-  const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-  });
-  rl.question('Enter the code from that page here: ', (code) => {
-    rl.close();
-    oAuth2Client.getToken(code, (err, token) => {
-      if (err) return console.error('Error retrieving access token', err);
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-        if (err) return console.error(err);
-        console.log('Token stored to', TOKEN_PATH);
-      });
-      callback(oAuth2Client);
+    const authUrl = oAuth2Client.generateAuthUrl({
+        access_type: 'offline',
+        scope: SCOPES,
     });
-  });
+    console.log('Authorize this app by visiting this url:', authUrl);
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+    rl.question('Enter the code from that page here: ', (code) => {
+        rl.close();
+        oAuth2Client.getToken(code, (err, token) => {
+            if (err) return console.error('Error retrieving access token', err);
+            oAuth2Client.setCredentials(token);
+            // Store the token to disk for later program executions
+            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+                if (err) return console.error(err);
+                console.log('Token stored to', TOKEN_PATH);
+            });
+            callback(oAuth2Client);
+        });
+    });
 }
 
 
-  function uploadFile(auth) {
+
+function uploadFile(auth) {
     const drive = google.drive({ version: 'v3', auth });
     var fileMetadata = {
         'name': 'Bottest.jpg'
@@ -120,8 +122,7 @@ function getAccessToken(oAuth2Client, callback) {
         }
     });
 }
-  
-}
+
     message = {
       text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
     };
@@ -154,18 +155,6 @@ export const getConversationsHistory = (req, res) => {
     }
     console.log(response.body);
     console.log(JSONresponse);
-    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${req.channel.id}`,
-    method: 'GET',
-  };
-  console.log(options);
-  request(options, (error, response, body) => {
-    const payload = JSON.parse(body);
-    const data = payload.messages.map(msg => ({
-      by: msg.user,
-      time: msg.ts,
-      text: msg.text,
-    }));
-    console.log(data);
   });
   // google drive auth function is called here
 };
