@@ -18,9 +18,9 @@ export const getSlashCommandInfo = (req, res) => {
 export const initButtonConfirmation = (req, res) => {
   let message;
   res.status(200).end(); // best practice to respond with 200 status
-  const payload = req.body;
+  const payload = JSON.stringify(req.body);
   console.log(payload);
-  if (payload.actions[0].name === 'no') {
+  if (payload.actions.name === 'no') {
     message = {
       text: `Bye ${payload.user.name}`,
       replace_original: false,
