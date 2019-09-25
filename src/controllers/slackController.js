@@ -31,7 +31,41 @@ export const initButtonConfirmation = (req, res, next) => {
       text: `Bye ${responsePayload.user.name}`,
     };
   } else {
-    const SCOPES = ['https://www.googleapis.com/auth/drive'];
+    message = {
+      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
+    };
+  }
+  const postOptions = prepareRequestMessage('POST', responsePayload.response_url, message);
+  request(postOptions, (error, response, body) => {
+    if (error) {
+      console.log(error);
+    }
+    return;
+  });
+  req.channel = responsePayload.channel;
+  // get slack channel history
+  next();
+};
+
+export const getConversationsHistory = (req, res) => {
+  const options = {
+    uri: 'https://slack.com/api/conversations.history',
+    method: 'GET',
+    headers: {
+      'Content-type': 'application/x-www-form-urlencoded',
+    },
+    json: req.channel.id,
+  };
+  request(options, (error, response, body) => {
+    const JSONresponse = JSON.parse(body);
+    if (!JSONresponse.ok) {
+      res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
+    }
+    console.log(response.body);
+    console.log(JSONresponse);
+  });
+  // google drive auth function is called here
+  const SCOPES = ['https://www.googleapis.com/auth/drive'];
 // The file token.json stores the user's access and refresh tokens, and is
 // created automatically when the authorization flow completes for the first
 // time.
@@ -41,8 +75,6 @@ const TOKEN_PATH = 'token.json';
 fs.readFile('credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, then call the Google Drive API.
-    //authorize(JSON.parse(content), listFiles);
-    //authorize(JSON.parse(content), getFile);
     authorize(JSON.parse(content), uploadFile);
 });
 
@@ -123,38 +155,4 @@ function uploadFile(auth) {
     });
 }
 
-    message = {
-      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
-    };
-  }
-  const postOptions = prepareRequestMessage('POST', responsePayload.response_url, message);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-    }
-    return;
-  });
-  req.channel = responsePayload.channel;
-  // get slack channel history
-  next();
-};
-
-export const getConversationsHistory = (req, res) => {
-  const options = {
-    uri: 'https://slack.com/api/conversations.history',
-    method: 'GET',
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded',
-    },
-    json: req.channel.id,
-  };
-  request(options, (error, response, body) => {
-    const JSONresponse = JSON.parse(body);
-    if (!JSONresponse.ok) {
-      res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
-    }
-    console.log(response.body);
-    console.log(JSONresponse);
-  });
-  // google drive auth function is called here
 };
