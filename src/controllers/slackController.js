@@ -6,18 +6,6 @@ const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
 
-const credentials = 
-{
-    "installed":{
-        "client_id":"889293040852-p6uq7kd7nour4ue8dsi1g2t184t70s3e.apps.googleusercontent.com",
-        "project_id":"quickstart-1569327421115",
-        "auth_uri":"https://accounts.google.com/o/oauth2/auth",
-        "token_uri":"https://oauth2.googleapis.com/token",
-        "auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs",
-        "client_secret":"En6W2ZSpkmT4RhsbB7mcBE8-",
-        "redirect_uris":["urn:ietf:wg:oauth:2.0:oob","http://localhost"]
-    }
-};
 
 export const getSlashCommandInfo = (req, res) => {
   res.status(200).end(); // best practice to respond with 200 status
@@ -84,7 +72,7 @@ export const getConversationsHistory = (req, res) => {
 const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
-fs.readFile(credentials, (err, content) => {
+fs.readFile('credentials.json', (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, then call the Google Drive API.
     authorize(JSON.parse(content), uploadFile);
