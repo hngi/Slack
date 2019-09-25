@@ -57,6 +57,7 @@ export const getConversationsHistory = (req, res) => {
       res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
     }
     console.log(response.body);
+    console.log(JSONresponse);
   });
   // google drive auth function is called here
 };
