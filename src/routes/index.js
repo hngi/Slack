@@ -1,7 +1,7 @@
 /* eslint-disable max-len */
-import { successResponse, warningResponse } from '../helpers/responseHelper';
+import { warningResponse } from '../helpers/responseHelper';
 import { authenticateApp, authenticateAppRedirect, checkAuth } from '../controllers/authController';
-import { getSlashCommandInfo, initButtonConfirmation } from '../controllers/slackController';
+import { getSlashCommandInfo, initButtonConfirmation, getConversationsHistory } from '../controllers/slackController';
 
 /**
  * @fileOverview This file manages all routes in the application
@@ -15,9 +15,7 @@ const routes = (app) => {
   app.get('/auth', authenticateApp);
   app.get('/auth/redirect', authenticateAppRedirect);
   app.post('/export-command', checkAuth, getSlashCommandInfo);
-  app.post('/slack/actions', initButtonConfirmation);
-  // invalid url
-  app.all('*', (req, res) => warningResponse(res, 404, 'Resource not found'));
+  app.post('/slack/actions', initButtonConfirmation, getConversationsHistory);
 };
 
 export default routes;
