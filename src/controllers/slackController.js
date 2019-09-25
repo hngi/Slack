@@ -12,6 +12,7 @@ export const getSlashCommandInfo = (req, res) => {
       console.log(error);
       return;
     }
+    return;
   });
 };
 
@@ -20,7 +21,7 @@ export const initButtonConfirmation = (req, res) => {
   res.status(200).end(); // best practice to respond with 200 status
   const responsePayload = JSON.parse(req.body.payload);
   console.log(responsePayload);
-  if (responsePayload.actions.name === 'no') {
+  if (responsePayload.actions[0].name === 'no') {
     message = {
       text: `Bye ${responsePayload.user.name}`,
       replace_original: false,
@@ -35,9 +36,8 @@ export const initButtonConfirmation = (req, res) => {
   request(postOptions, (error, response, body) => {
     if (error) {
       console.log(error);
-      return;
     }
-
+    return;
     // google drive auth function is called here
   });
 };

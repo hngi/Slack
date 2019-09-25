@@ -13,11 +13,11 @@ import { getSlashCommandInfo, initButtonConfirmation } from '../controllers/slac
 
 const routes = (app) => {
   app.get('/', (req, res) => successResponse(res, 200, {
-    title: 'Welcome to Priapus SlackBot',
-    description: 'A slack bot that can be used to save conversation in Google drive<br/>',
-    slackAppLink: '<a href="https://priapus.slack.com/services/BNFNQH27K">App Link</a><br/>',
-    slackWorkspace: '<a href="https://join.slack.com/t/priapus/shared_invite/enQtNzcwNTA1MTg3NTg4LThmODNkNjQ4MTdiMGEzMGM1MmZjNGJhYWE0Y2UwMjA1NDQyYTg3MWVhYTVkNjk0MzEzNGU0ZGIwODgxZWM3ZDk">Slack Workspace</a><br/>',
-    instruction: 'To get started, goto the Slack workspace and register as a user. <br/> use /export-conversation to export conversation histroy of any channel there.',
+    title: 'Welcome to Priapus SlackBot\n',
+    description: 'A slack bot that can be used to save conversation in Google drive \n',
+    slackAppLink: 'https://priapus.slack.com/services/BNFNQH27K',
+    slackWorkspace: 'https://join.slack.com/t/priapus/shared_invite/enQtNzcwNTA1MTg3NTg4LThmODNkNjQ4MTdiMGEzMGM1MmZjNGJhYWE0Y2UwMjA1NDQyYTg3MWVhYTVkNjk0MzEzNGU0ZGIwODgxZWM3ZDk',
+    instruction: 'To get started, goto the Slack workspace and register as a user. Use /export-conversation to export conversation histroy of any channel there',
   }));
   app.get('/auth', authenticateApp);
   app.get('/auth/redirect', authenticateAppRedirect);
