@@ -1,8 +1,8 @@
 /* eslint-disable no-unused-vars */
 
-export const prepareRequestMessage = (responseURL, JSONmessage) => ({
+export const prepareRequestMessage = (method, responseURL, JSONmessage) => ({
   uri: responseURL,
-  method: 'POST',
+  method,
   headers: {
     'Content-type': 'application/json',
   },
