@@ -71,7 +71,7 @@ export const getConversationsHistory = (req, res) => {
 // time.
 const TOKEN_PATH = 'token.json';
 
-const filepath = nodePath.join(process.cwd(), 'credentials.json');
+const filepath = __dirname + '/credentials.json';;
 
 // Load client secrets from a local file.
 fs.readFile(filepath, (err, content) => {
