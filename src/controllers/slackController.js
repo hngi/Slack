@@ -56,14 +56,14 @@ export const getConversationsHistory = (req, res) => {
     },
     json: req.channel.id,
   };
-  request(options, (error, response, body) => {
-    const JSONresponse = JSON.parse(body);
-    if (!JSONresponse.ok) {
-      res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
-    }
-    console.log(response.body);
-    console.log(JSONresponse);
-  });
+  // request(options, (error, response, body) => {
+  //   const JSONresponse = JSON.parse(body);
+  //   if (!JSONresponse.ok) {
+  //     res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
+  //   }
+  //   console.log(response.body);
+  //   console.log(JSONresponse);
+  // });
   // google drive auth function is called here
   const SCOPES = ['https://www.googleapis.com/auth/drive'];
 // The file token.json stores the user's access and refresh tokens, and is
@@ -71,8 +71,10 @@ export const getConversationsHistory = (req, res) => {
 // time.
 const TOKEN_PATH = 'token.json';
 
+const filepath = __dirname + '/credentials.json';;
+
 // Load client secrets from a local file.
-fs.readFile('../config/credentials.json', (err, content) => {
+fs.readFile(filepath, (err, content) => {
     if (err) return console.log('Error loading client secret file:', err);
     // Authorize a client with credentials, then call the Google Drive API.
     authorize(JSON.parse(content), uploadFile);
