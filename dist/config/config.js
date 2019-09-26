@@ -5,7 +5,7 @@ var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefau
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.REDIRECT_URI = exports.CLIENT_SECRET = exports.CLIENT_ID = exports.BOT_TOKEN = void 0;
+exports.googleConfig = exports.REDIRECT_URI = exports.CLIENT_SECRET = exports.CLIENT_ID = exports.BOT_TOKEN = void 0;
 
 var _dotenv = _interopRequireDefault(require("dotenv"));
 
@@ -27,3 +27,12 @@ exports.REDIRECT_URI = REDIRECT_URI;
 exports.CLIENT_SECRET = CLIENT_SECRET;
 exports.CLIENT_ID = CLIENT_ID;
 exports.BOT_TOKEN = BOT_TOKEN;
+var googleConfig = {
+  clientId: process.env.GOOGLE_CLIENT_ID,
+  // e.g. asdfghjkljhgfdsghjk.apps.googleusercontent.com
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  // e.g. _ASDFA%DFASDFASDFASD#FAD-
+  redirect: process.env.GOOGLE_REDIRECT_URL // this must match your google api settings
+
+};
+exports.googleConfig = googleConfig;

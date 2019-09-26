@@ -1,7 +1,6 @@
-/* eslint-disable max-len */
-import { warningResponse } from '../helpers/responseHelper';
 import { authenticateApp, authenticateAppRedirect, checkAuth } from '../controllers/authController';
-import { getSlashCommandInfo, initButtonConfirmation, getConversationsHistory } from '../controllers/slackController';
+import { getSlashCommandInfo } from '../controllers/slackController';
+import { getGoogleAccountFromCode } from '../controllers/googleController';
 
 /**
  * @fileOverview This file manages all routes in the application
@@ -15,7 +14,7 @@ const routes = (app) => {
   app.get('/auth', authenticateApp);
   app.get('/auth/redirect', authenticateAppRedirect);
   app.post('/export-command', checkAuth, getSlashCommandInfo);
-  app.post('/slack/actions', initButtonConfirmation, getConversationsHistory);
+  app.get('/google/redirect', getGoogleAccountFromCode);
 };
 
 export default routes;

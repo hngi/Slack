@@ -1,168 +1,72 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable max-len */
 import request from 'request';
+import fs from 'fs';
+import os from 'os';
 import { prepareRequestMessage } from '../helpers/slackRequest';
-import { initMessage } from '../helpers/messages';
-import {BOT_TOKEN} from '../config/config'
+import { BOT_TOKEN, CONVERSATION_PATH } from '../config/config';
+import { authorize, uploadConversation } from './googleController';
 
-const SlackClient = require('@slack/client').WebClient;
-const fs = require('fs');
-const readline = require('readline');
-const { google } = require('googleapis');
+async function getConversationsHistory(channelId, authentication) {
+  const options = {
+    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${channelId}`,
+    method: 'GET',
+  };
+  fs.readFile(CONVERSATION_PATH, (errors, data) => {
+    if (errors) console.error(errors);
+    console.log('initial', data);
+  });
+  request(options, async (error, response, body) => {
+    const payload = JSON.parse(body);
+    let conversation = '';
+    payload.messages.map((msg, index) => {
+      const { user, ts, text } = msg;
+      conversation += `${index + 1},'${user}',${ts},'${text}${os.EOL}'`;
+      return conversation;
+    });
+    fs.appendFile(CONVERSATION_PATH, String(conversation), { flag: 'a+' }, async (err) => {
+      if (err) return console.error(err);
+    });
+    fs.readFile(CONVERSATION_PATH, (errors, data) => {
+      if (errors) console.error(errors);
+      console.log('final', data);
+    });
+    const upload = await uploadConversation(authentication);
+    return upload;
+  });
+}
 
-const slack = new SlackClient(BOT_TOKEN);
-
-
-export const getSlashCommandInfo = (req, res) => {
+export const getSlashCommandInfo = async (req, res) => {
   res.status(200).end(); // best practice to respond with 200 status
   const payload = req.body;
   const responseURL = payload.response_url;
-  const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    return;
-  });
-};
-
-export const initButtonConfirmation = (req, res, next) => {
-  let message;
-  res.sendStatus(200).end(); // best practice to respond with 200 status
-  const responsePayload = JSON.parse(req.body.payload);
-  console.log(responsePayload);
-  if (responsePayload.actions[0].name === 'no') {
-    message = {
-      text: `Bye ${responsePayload.user.name}`,
+  let initMessage;
+  const authentication = await authorize();
+  if (typeof authentication === 'string') {
+    initMessage = {
+      text: `*One time access! Follow link below to allow Priapus Bot upload conversation to your drive*  \n\n ${authentication}. \n\nRemember to launch this command again`,
     };
+    const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
+    request(postOptions, (error, response, body) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+    });
   } else {
-    message = {
-      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
+    // upload to drive
+    const upload = await getConversationsHistory(payload.channel_id, authentication);
+    // const upload = await uploadConversation(authentication);
+    initMessage = {
+      // text: `Your conversation has been saved to your Google drive \n\n View it here https://drive.google.com/file/d/${upload.data.id}/view`,
+      text: 'Your conversation has been saved to your Google drive \n\n Check the file conversation.csv',
     };
+    const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
+    request(postOptions, (error, response, body) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+    });
   }
-  const postOptions = prepareRequestMessage('POST', responsePayload.response_url, message);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-    }
-    return;
-  });
-  req.channel = responsePayload.channel;
-  // get slack channel history
-  next();
-};
-
-export const getConversationsHistory = (req, res) => {
-  const options = {
-    uri: 'https://slack.com/api/conversations.history',
-    method: 'GET',
-    headers: {
-      'Content-type': 'application/x-www-form-urlencoded',
-    },
-    json: req.channel.id,
-  };
-  // request(options, (error, response, body) => {
-  //   const JSONresponse = JSON.parse(body);
-  //   if (!JSONresponse.ok) {
-  //     res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
-  //   }
-  //   console.log(response.body);
-  //   console.log(JSONresponse);
-  // });
-  // google drive auth function is called here
-  const SCOPES = ['https://www.googleapis.com/auth/drive'];
-// The file token.json stores the user's access and refresh tokens, and is
-// created automatically when the authorization flow completes for the first
-// time.
-const TOKEN_PATH = 'token.json';
-
-const filepath = __dirname + '/credentials.json';;
-
-// Load client secrets from a local file.
-fs.readFile(filepath, (err, content) => {
-    if (err) return console.log('Error loading client secret file:', err);
-    // Authorize a client with credentials, then call the Google Drive API.
-    authorize(JSON.parse(content), uploadFile);
-});
-
-/**
- * Create an OAuth2 client with the given credentials, and then execute the
- * given callback function.
- * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
- */
-function authorize(credentials, callback) {
-    const { client_secret, client_id, redirect_uris } = credentials.installed;
-    const oAuth2Client = new google.auth.OAuth2(
-        client_id, client_secret, redirect_uris[0]);
-
-    // Check if we have previously stored a token.
-    fs.readFile(TOKEN_PATH, (err, token) => {
-        if (err) return getAccessToken(oAuth2Client, callback);
-        oAuth2Client.setCredentials(JSON.parse(token));
-        callback(oAuth2Client);//list files and upload file
-        //callback(oAuth2Client, '0B79LZPgLDaqESF9HV2V3YzYySkE');//get file
-
-    });
-}
-
-/**
- * Get and store new token after prompting for user authorization, and then
- * execute the given callback with the authorized OAuth2 client.
- * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
- */
-function getAccessToken(oAuth2Client, callback) {
-    const authUrl = oAuth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: SCOPES,
-    });
-    slack.chat.postMessage({
-      channel: 'C024BE91L',
-      text: `Authorize this app by visiting this url: ${authUrl}`
-    });
-    console.log('Authorize this app by visiting this url:', authUrl);
-    const rl = readline.createInterface({
-        input: process.stdin,
-        output: process.stdout,
-    });
-    rl.question('Enter the code from that page here: ', (code) => {
-        rl.close();
-        oAuth2Client.getToken(code, (err, token) => {
-            if (err) return console.error('Error retrieving access token', err);
-            oAuth2Client.setCredentials(token);
-            // Store the token to disk for later program executions
-            fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
-                if (err) return console.error(err);
-                console.log('Token stored to', TOKEN_PATH);
-            });
-            callback(oAuth2Client);
-        });
-    });
-}
-
-
-
-function uploadFile(auth) {
-    const drive = google.drive({ version: 'v3', auth });
-    var fileMetadata = {
-        'name': 'Bottest.jpg'
-    };
-    var media = {
-        mimeType: 'image/jpeg',
-        body: fs.createReadStream('../helpers/test.jpg')
-    };
-    drive.files.create({
-        resource: fileMetadata,
-        media: media,
-        fields: 'id'
-    }, function (err, res) {
-        if (err) {
-            // Handle error
-            console.log(err);
-        } else {
-            console.log('File Id: ', res.data.id);
-        }
-    });
-}
-
 };

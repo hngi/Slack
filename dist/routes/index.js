@@ -11,6 +11,8 @@ var _authController = require("../controllers/authController");
 
 var _slackController = require("../controllers/slackController");
 
+var _googleController = require("../controllers/googleController");
+
 /* eslint-disable max-len */
 
 /**
@@ -25,6 +27,7 @@ var routes = function routes(app) {
   app.get('/auth/redirect', _authController.authenticateAppRedirect);
   app.post('/export-command', _authController.checkAuth, _slackController.getSlashCommandInfo);
   app.post('/slack/actions', _slackController.initButtonConfirmation, _slackController.getConversationsHistory);
+  app.get('/google/redirect', _googleController.getGoogleAccountFromCode);
 };
 
 var _default = routes;
