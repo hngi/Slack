@@ -1,4 +1,8 @@
+/* eslint-disable array-callback-return */
+/* eslint-disable max-len */
 import request from 'request';
+import fs from 'fs';
+import os from 'os';
 import { prepareRequestMessage } from '../helpers/slackRequest';
 import { initMessage } from '../helpers/messages';
 import { BOT_TOKEN } from '../config/config';

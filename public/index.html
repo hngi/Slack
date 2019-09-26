@@ -1,7 +1,8 @@
 <html>
 
   <head>
-    <title class="">Priapus SlackBot</title>\
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title class="">Priapus SlackBot</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   </head>
 
@@ -9,22 +10,28 @@
     <div class="row">
       <div class="container" style="margin-top: 3em">
         <div class="col-md-12">
-          <h3 class="">Welcome to Priapus SlackBot</h3>
-          <h5 class="">A slack bot that can be used to save slack channel conversation in Google drive</h5>
-          <a href="https://priapus.slack.com/services/BNFNQH27K">Slack App Link</a><br/>
-          <hr>
-          <dl class="row">
-            <dt class="col-sm-3">Get Started</dt>
-            <dd class="col-sm-9">
-              <p>Goto the <a href="https://join.slack.com/t/priapus/shared_invite/enQtNzcwNTA1MTg3NTg4LThmODNkNjQ4MTdiMGEzMGM1MmZjNGJhYWE0Y2UwMjA1NDQyYTg3MWVhYTVkNjk0MzEzNGU0ZGIwODgxZWM3ZDk">Slack Workspace</a> and register as a user..</p>
-            </dd>
-          </dl>
-          <dl class="row">
-            <dt class="col-sm-3">Usage</dt>
-            <dd class="col-sm-9">
-              <p>To export conversation histroy of any channel there type:<pre>/export-conversation</pre></p>
-            </dd>
-          </dl>
+          <div class="alert alert-secondary" role="alert">
+            <h3 class="">Welcome to Priapus SlackBot</h3>
+            <h5 class="">A slack bot that can be used to save slack channel conversation in Google drive</h5>
+            <a href="https://priapus.slack.com/services/BNFNQH27K">Slack App Link</a><br/>
+          </div>
+          <div style="padding: 10px 20px; border: 1px solid #d5d5d5; border-radius: 5px">
+            <dl class="row">
+              <dt class="col-sm-3">Get Started</dt>
+              <dd class="col-sm-9">
+                <p>Goto the <a href="https://join.slack.com/t/priapus/shared_invite/enQtNzcwNTA1MTg3NTg4LThmODNkNjQ4MTdiMGEzMGM1MmZjNGJhYWE0Y2UwMjA1NDQyYTg3MWVhYTVkNjk0MzEzNGU0ZGIwODgxZWM3ZDk">Slack Workspace</a> and register as a user..</p>
+              </dd>
+            </dl><hr>
+            <dl class="row">
+              <dt class="col-sm-3">Usage</dt>
+              <dd class="col-sm-9">
+                <p>To export conversation histroy of any channel there type:<pre>/export-conversation</pre></p>
+                <div class="alert alert-warning" role="alert">
+                  <strong>NOTE:</strong> If you are running this command the first time, you will be asked to allow PriapusBot have write access to your Google drive
+                </div>
+              </dd>
+            </dl>
+          </div>
         </div>
       </div>
 
