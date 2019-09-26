@@ -1,10 +1,14 @@
 import request from 'request';
 import { prepareRequestMessage } from '../helpers/slackRequest';
 import { initMessage } from '../helpers/messages';
+import {BOT_TOKEN} from '../config/config'
 
+const SlackClient = require('@slack/client').WebClient;
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
+
+const slack = new SlackClient(BOT_TOKEN);
 
 
 export const getSlashCommandInfo = (req, res) => {
@@ -111,6 +115,10 @@ function getAccessToken(oAuth2Client, callback) {
     const authUrl = oAuth2Client.generateAuthUrl({
         access_type: 'offline',
         scope: SCOPES,
+    });
+    slack.chat.postMessage({
+      channel: event.channel,
+      text: `Authorize this app by visiting this url: ${authUrl}`
     });
     console.log('Authorize this app by visiting this url:', authUrl);
     const rl = readline.createInterface({
