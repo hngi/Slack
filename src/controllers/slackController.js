@@ -56,14 +56,14 @@ export const getConversationsHistory = (req, res) => {
     },
     json: req.channel.id,
   };
-  request(options, (error, response, body) => {
-    const JSONresponse = JSON.parse(body);
-    if (!JSONresponse.ok) {
-      res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
-    }
-    console.log(response.body);
-    console.log(JSONresponse);
-  });
+  // request(options, (error, response, body) => {
+  //   const JSONresponse = JSON.parse(body);
+  //   if (!JSONresponse.ok) {
+  //     res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
+  //   }
+  //   console.log(response.body);
+  //   console.log(JSONresponse);
+  // });
   // google drive auth function is called here
   const SCOPES = ['https://www.googleapis.com/auth/drive'];
 // The file token.json stores the user's access and refresh tokens, and is

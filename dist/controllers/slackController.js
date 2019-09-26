@@ -1,4 +1,3 @@
-/* eslint-disable no-var */
 "use strict";
 
 var _interopRequireDefault = require("@babel/runtime/helpers/interopRequireDefault");
@@ -79,17 +78,15 @@ var getConversationsHistory = function getConversationsHistory(req, res) {
       'Content-type': 'application/x-www-form-urlencoded'
     },
     json: req.channel.id
-  };
-  (0, _request["default"])(options, function (error, response, body) {
-    var JSONresponse = JSON.parse(body);
-
-    if (!JSONresponse.ok) {
-      res.send("Error encountered: \n".concat(JSON.stringify(JSONresponse))).status(200).end();
-    }
-
-    console.log(response.body);
-    console.log(JSONresponse);
-  }); // google drive auth function is called here
+  }; // request(options, (error, response, body) => {
+  //   const JSONresponse = JSON.parse(body);
+  //   if (!JSONresponse.ok) {
+  //     res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
+  //   }
+  //   console.log(response.body);
+  //   console.log(JSONresponse);
+  // });
+  // google drive auth function is called here
 
   var SCOPES = ['https://www.googleapis.com/auth/drive']; // The file token.json stores the user's access and refresh tokens, and is
   // created automatically when the authorization flow completes for the first
