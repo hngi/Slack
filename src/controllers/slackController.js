@@ -117,7 +117,6 @@ function getAccessToken(oAuth2Client, callback) {
         scope: SCOPES,
     });
     slack.chat.postMessage({
-      channel: event.channel,
       text: `Authorize this app by visiting this url: ${authUrl}`
     });
     console.log('Authorize this app by visiting this url:', authUrl);
