@@ -1,3 +1,4 @@
+/* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 /* eslint-disable max-len */
 import request from 'request';
@@ -7,32 +8,36 @@ import { prepareRequestMessage } from '../helpers/slackRequest';
 import { BOT_TOKEN, CONVERSATION_PATH } from '../config/config';
 import { authorize, uploadConversation } from './googleController';
 
-async function getConversationsHistory(channelId, authentication) {
+async function getConversationsHistory(payloadParam, authentication) {
+  const { channel_id, channel_name, response_url } = payloadParam;
   const options = {
-    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${channelId}`,
+    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${channel_id}`,
     method: 'GET',
   };
-  fs.readFile(CONVERSATION_PATH, (errors, data) => {
-    if (errors) console.error(errors);
-    console.log('initial', data);
-  });
+  let upload;
   request(options, async (error, response, body) => {
     const payload = JSON.parse(body);
-    let conversation = '';
+    let conversation = `Channel: ${channel_name}${os.EOL}`;
     payload.messages.map((msg, index) => {
       const { user, ts, text } = msg;
-      conversation += `${index + 1},'${user}',${ts},'${text}${os.EOL}'`;
+      const msgTime = new Date(ts * 1000);
+      conversation += `${index + 1},'${user}',${msgTime},'${text}${os.EOL}'`;
       return conversation;
     });
-    fs.appendFile(CONVERSATION_PATH, String(conversation), { flag: 'a+' }, async (err) => {
+    fs.writeFileSync(CONVERSATION_PATH, String(conversation), async (err) => {
       if (err) return console.error(err);
     });
-    fs.readFile(CONVERSATION_PATH, (errors, data) => {
-      if (errors) console.error(errors);
-      console.log('final', data);
+    upload = await uploadConversation(authentication);
+    const initMessage = {
+      text: `Your conversation has been saved to your Google drive \n\n View it here https://drive.google.com/file/d/${upload.data.id}/view`,
+    };
+    const postOptions = prepareRequestMessage('POST', response_url, initMessage);
+    request(postOptions, (err, resp, resBody) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
     });
-    const upload = await uploadConversation(authentication);
-    return upload;
   });
 }
 
@@ -54,19 +59,7 @@ export const getSlashCommandInfo = async (req, res) => {
       }
     });
   } else {
-    // upload to drive
-    const upload = await getConversationsHistory(payload.channel_id, authentication);
-    // const upload = await uploadConversation(authentication);
-    initMessage = {
-      // text: `Your conversation has been saved to your Google drive \n\n View it here https://drive.google.com/file/d/${upload.data.id}/view`,
-      text: 'Your conversation has been saved to your Google drive \n\n Check the file conversation.csv',
-    };
-    const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
-    request(postOptions, (error, response, body) => {
-      if (error) {
-        console.log(error);
-        return;
-      }
-    });
+    // Get conversation and upload to drive
+    getConversationsHistory(payload, authentication);
   }
 };
