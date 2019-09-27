@@ -1,65 +1,66 @@
+/* eslint-disable consistent-return */
 /* eslint-disable array-callback-return */
 /* eslint-disable max-len */
 import request from 'request';
 import fs from 'fs';
 import os from 'os';
 import { prepareRequestMessage } from '../helpers/slackRequest';
-import { initMessage } from '../helpers/messages';
-import { BOT_TOKEN } from '../config/config';
+import { BOT_TOKEN, CONVERSATION_PATH } from '../config/config';
+import { authorize, uploadConversation } from './googleController';
 
-export const getSlashCommandInfo = (req, res) => {
+async function getConversationsHistory(payloadParam, authentication) {
+  const { channel_id, channel_name, response_url } = payloadParam;
+  const options = {
+    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${channel_id}`,
+    method: 'GET',
+  };
+  let upload;
+  request(options, async (error, response, body) => {
+    const payload = JSON.parse(body);
+    let conversation = `CHANNEL: ${channel_name.toUpperCase()}${os.EOL}`;
+    conversation += `ID,NAME,TIME,MESSAGE${os.EOL}`;
+    payload.messages.map((msg, index) => {
+      const { user, ts, text } = msg;
+      const msgTime = new Date(ts);
+      conversation += `${index + 1},'${user}',${msgTime},'${text}'${os.EOL}`;
+      return conversation;
+    });
+    fs.writeFileSync(CONVERSATION_PATH, String(conversation), async (err) => {
+      if (err) return console.error(err);
+    });
+    upload = await uploadConversation(authentication);
+    const initMessage = {
+      text: `Your conversation has been saved to your Google drive \n\n View it here https://drive.google.com/file/d/${upload.data.id}/view`,
+    };
+    const postOptions = prepareRequestMessage('POST', response_url, initMessage);
+    request(postOptions, (err, resp, resBody) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    });
+  });
+}
+
+export const getSlashCommandInfo = async (req, res) => {
   res.status(200).end(); // best practice to respond with 200 status
   const payload = req.body;
   const responseURL = payload.response_url;
-  const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-      return;
-    }
-    return;
-  });
-};
-
-export const initButtonConfirmation = (req, res, next) => {
-  let message;
-  res.sendStatus(200).end(); // best practice to respond with 200 status
-  const responsePayload = JSON.parse(req.body.payload);
-  if (responsePayload.actions[0].name === 'no') {
-    message = {
-      text: `Bye ${responsePayload.user.name}`,
+  let initMessage;
+  const authentication = await authorize();
+  if (typeof authentication === 'string') {
+    initMessage = {
+      text: `*One time access! Follow link below to allow Priapus Bot upload conversation to your drive*  \n\n ${authentication}. \n\nRemember to launch this command again`,
     };
+    const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
+    request(postOptions, (error, response, body) => {
+      if (error) {
+        console.log(error);
+        return;
+      }
+    });
   } else {
-    message = {
-      text: `${responsePayload.user.name} your conversation will be saved to Google Drive`,
-    };
+    // Get conversation and upload to drive
+    getConversationsHistory(payload, authentication);
   }
-  const postOptions = prepareRequestMessage('POST', responsePayload.response_url, message);
-  request(postOptions, (error, response, body) => {
-    if (error) {
-      console.log(error);
-    }
-    return;
-  });
-  req.channel = responsePayload.channel;
-  // get slack channel history
-  next();
-};
-
-export const getConversationsHistory = (req, res) => {
-  const options = {
-    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${req.channel.id}`,
-    method: 'GET',
-  };
-  console.log(options);
-  request(options, (error, response, body) => {
-    const payload = JSON.parse(body);
-    const data = payload.messages.map(msg => ({
-      by: msg.user,
-      time: msg.ts,
-      text: msg.text,
-    }));
-    console.log(data);
-  });
-  // google drive auth function is called here
 };
