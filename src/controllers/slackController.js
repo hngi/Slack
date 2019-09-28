@@ -5,13 +5,14 @@ import request from 'request';
 import fs from 'fs';
 import os from 'os';
 import { prepareRequestMessage } from '../helpers/slackRequest';
-import { BOT_TOKEN, CONVERSATION_PATH } from '../config/config';
+import { CONVERSATION_PATH } from '../config/config';
 import { authorize, uploadConversation } from './googleController';
+import { ACCESS_TOKEN } from '../../token';
 
 async function getConversationsHistory(payloadParam, authentication) {
   const { channel_id, channel_name, response_url } = payloadParam;
   const options = {
-    uri: `https://priapus.slack.com/api/conversations.history?token=${BOT_TOKEN}&channel=${channel_id}`,
+    uri: `https://priapus.slack.com/api/conversations.history?token=${ACCESS_TOKEN[payloadParam.team_id]}&channel=${channel_id}`,
     method: 'GET',
   };
   let upload;
@@ -21,8 +22,9 @@ async function getConversationsHistory(payloadParam, authentication) {
     conversation += `ID,NAME,TIME,MESSAGE${os.EOL}`;
     payload.messages.map((msg, index) => {
       const { user, ts, text } = msg;
-      const msgTime = new Date(ts);
-      conversation += `${index + 1},'${user}',${msgTime},'${text}'${os.EOL}`;
+      const formatedText = text.replace(/(\r\n|\n|\r)/gm, '. ');
+      const msgTime = new Date(ts * 1000).toUTCString();
+      conversation += `${index + 1},'${user}','${msgTime}','${formatedText}'${os.EOL}`;
       return conversation;
     });
     fs.writeFileSync(CONVERSATION_PATH, String(conversation), async (err) => {
@@ -30,7 +32,19 @@ async function getConversationsHistory(payloadParam, authentication) {
     });
     upload = await uploadConversation(authentication);
     const initMessage = {
-      text: `Your conversation has been saved to your Google drive \n\n View it here https://drive.google.com/file/d/${upload.data.id}/view`,
+      text: 'Conversation has been saved to your Google drive as `conversation.csv`',
+      attachments: [
+        {
+          fallback: 'preview_here',
+          actions: [
+            {
+              type: 'button',
+              text: 'Preview',
+              url: `https://drive.google.com/file/d/${upload.data.id}/view`,
+            },
+          ],
+        },
+      ],
     };
     const postOptions = prepareRequestMessage('POST', response_url, initMessage);
     request(postOptions, (err, resp, resBody) => {
@@ -50,7 +64,20 @@ export const getSlashCommandInfo = async (req, res) => {
   const authentication = await authorize();
   if (typeof authentication === 'string') {
     initMessage = {
-      text: `*One time access! Follow link below to allow Priapus Bot upload conversation to your drive*  \n\n ${authentication}. \n\nRemember to launch this command again`,
+      text: '*One time authorization! Click the button below to allow Priapus Saver upload conversation to your Google Drive*',
+      attachments: [
+        {
+          fallback: 'remember_to',
+          actions: [
+            {
+              type: 'button',
+              text: 'Authorize Priapus',
+              url: authentication,
+            },
+          ],
+          text: 'Remember to launch this command again after authorization',
+        },
+      ],
     };
     const postOptions = prepareRequestMessage('POST', responseURL, initMessage);
     request(postOptions, (error, response, body) => {

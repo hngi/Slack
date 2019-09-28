@@ -42,7 +42,6 @@ function getAccessToken(oAuth2Client) {
     access_type: 'offline',
     scope: SCOPES,
   });
-  // console.log('Authorize this app by visiting this url:', authUrl);
   return authUrl;
 }
 
@@ -70,7 +69,6 @@ export const getGoogleAccountFromCode = (req, res) => {
     // Store the token to disk for later program executions
     fs.writeFile(TOKEN_PATH, JSON.stringify(token), (error) => {
       if (error) return console.error(error);
-      return console.log('Token stored to', TOKEN_PATH);
     });
   });
   res.sendFile(path.join(__dirname, '../../public/redirect.html'));

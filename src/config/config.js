@@ -10,7 +10,7 @@ dotenv.config();
  */
 
 export const {
-  BOT_TOKEN, CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
+  CLIENT_ID, CLIENT_SECRET, REDIRECT_URI,
 } = process.env;
 
 export const googleConfig = {

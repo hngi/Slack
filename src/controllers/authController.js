@@ -1,12 +1,10 @@
 import request from 'request';
-import dotenv from 'dotenv';
 import {
-  BOT_TOKEN, CLIENT_ID, CLIENT_SECRET,
+  CLIENT_ID, CLIENT_SECRET,
 } from '../config/config';
 import { prepareRequestMessage } from '../helpers/slackRequest';
 import { forbiddenMessage } from '../helpers/messages';
-
-dotenv.config();
+import { ACCESS_TOKEN } from '../../token';
 
 export const authenticateApp = (req, res) => {
   res.sendFile(`${__dirname}/add_to_slack.html`);
@@ -19,10 +17,11 @@ export const authenticateAppRedirect = (req, res) => {
   };
   request(options, (error, response, body) => {
     const JSONresponse = JSON.parse(body);
+    const { access_token, team_id } = JSONresponse;
     if (!JSONresponse.ok) {
       res.send(`Error encountered: \n${JSON.stringify(JSONresponse)}`).status(200).end();
     }
-    process.env.BOT_TOKEN = JSONresponse.access_token;
+    ACCESS_TOKEN[team_id] = access_token;
     res.redirect('https://priapus.slack.com/apps/ANFETCSN5-priapus-saver');
   });
 };
