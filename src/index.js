@@ -34,6 +34,8 @@ app.use(cors('*'));
 
 routes(app);
 
+app.use('/redirect', (express.static(path.join(__dirname, '../public/redirect.html'))));
+
 // listen to app port
 app.listen(port, debug('app/debug')(`App listening on port ${port}`));
 

@@ -1,7 +1,7 @@
 import request from 'request';
 import dotenv from 'dotenv';
 import {
-  CLIENT_ID, CLIENT_SECRET,
+  BOT_TOKEN, CLIENT_ID, CLIENT_SECRET,
 } from '../config/config';
 import { prepareRequestMessage } from '../helpers/slackRequest';
 import { forbiddenMessage } from '../helpers/messages';

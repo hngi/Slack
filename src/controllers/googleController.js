@@ -72,8 +72,5 @@ export const getGoogleAccountFromCode = (req, res) => {
       return console.log('Token stored to', TOKEN_PATH);
     });
   });
-  return res.status(200).send({
-    ok: true,
-    message: 'Authentication successful. To save your conversation, go back and launch the command again',
-  });
+  res.redirect('https://priapus-slack.herokuapp.com/redirect');
 };
