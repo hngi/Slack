@@ -1,6 +1,7 @@
 /* eslint-disable consistent-return */
 import { google } from 'googleapis';
 import fs from 'mz/fs';
+import path from 'path';
 import { googleConfig, CONVERSATION_PATH, TOKEN_PATH } from '../config/config';
 
 
@@ -72,8 +73,5 @@ export const getGoogleAccountFromCode = (req, res) => {
       return console.log('Token stored to', TOKEN_PATH);
     });
   });
-  return res.status(200).send({
-    ok: true,
-    message: 'Authentication successful. To save your conversation, go back and launch the command again',
-  });
+  res.sendFile(path.join(__dirname, '../../public/redirect.html'));
 };
